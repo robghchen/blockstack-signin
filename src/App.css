@@ -6,10 +6,11 @@
 
 .hello {
   margin: auto;
+  min-width: 60%;
 }
 
 .button {
-  max-width: 8em;
+  max-width: 100%;
   max-height: 4em;
   font-size: 1em;
   margin: auto;
@@ -20,8 +21,45 @@
   border-color: #000;
   border-width: 2px;
 }
+
+.button-small:hover {
+  color: white;
+  border: 2px solid white;
+  background-color: black;
+}
+
+.button-small {
+  max-width: 100%;
+  max-height: 4em;
+  font-size: 0.8em;
+  margin: auto;
+  display: inline-block;
+  padding: 0.5em;
+  color: #000;
+  transition: color 0.3s linear;
+  border-color: #000;
+  border-width: 2px;
+}
+
 .button:hover {
   color: white;
   border: 2px solid white;
   background-color: black;
+}
+
+.forms {
+  display: flex;
+  margin-top: 5em;
+}
+
+.superhero,
+.crush {
+  flex: 1;
+}
+
+.form-control {
+  margin-top: 1em;
+  font-size: 1em;
+  padding: 0.35em;
+  border-radius: 0.3em 0em 0.3em 0.3em;
 }
