@@ -25,7 +25,7 @@ class App extends Component {
     }
 
     this.getUsers();
-    this.getGaiaUser(); // I'M NEW, find me below
+    this.getGaiaUser(); // I'M NEW, find me
   };
 
   handleSignIn = () => {
@@ -112,10 +112,13 @@ class App extends Component {
       })
     })
       .then(res => res.json())
-      .then(user => this.setState({ currentUser: user }));
+      .then(data => {
+        this.setState({ currentUser: data });
+        console.log("API", data); // see that the data transferred
+      });
   };
 
-  // I'M NEW, putFile is a method provided by Blockstack library
+  // I'M NEW, putFile is a method provided by the Blockstack library
   submitGaiaHandler = e => {
     const { userSession, crush } = this.state;
     const user = { crush: crush };
@@ -128,14 +131,14 @@ class App extends Component {
       .putFile("user.json", JSON.stringify(user), options)
       .then(data => {
         this.setState({ gaiaUser: user });
-        console.log(data); // see that the data is encrypted
+        console.log("Gaia Storage", data); // see that the data is encrypted
       });
 
     // note that at this time, Blockstack only allows PUT but not PATCH
     // you are replacing the entire gaiaUser object
   };
 
-  // I'M NEW, getFile is also a method provided by Blockstack library
+  // I'M NEW, getFile is also a method provided by the Blockstack library
   getGaiaUser = () => {
     const { userSession } = this.state;
     let options = { decrypt: true };
