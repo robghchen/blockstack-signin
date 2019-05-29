@@ -9,8 +9,8 @@ class App extends Component {
     users: [], // coming from your API
     currentUser: {}, // coming from your API
     superhero: "", // I'M NEW coming from form input
-    crush: "", // I'M NEW coming from form input
-    gaiaCrush: "" // I'M NEW coming from Gaia Storage
+    gaiaUser: {}, // I'M NEW coming from Gaia Storage
+    crush: "" // I'M NEW coming from form input
   };
 
   componentDidMount = async () => {
@@ -25,7 +25,7 @@ class App extends Component {
     }
 
     this.getUsers();
-    this.getGaiaCrush(); // I'M NEW, find me below
+    this.getGaiaUser(); // I'M NEW, find me below
   };
 
   handleSignIn = () => {
@@ -118,39 +118,43 @@ class App extends Component {
   // I'M NEW, putFile is a method provided by Blockstack library
   submitGaiaHandler = e => {
     const { userSession, crush } = this.state;
+    const user = { crush: crush };
+    let options = { encrypt: true };
 
     e.preventDefault();
 
     // encrypt and securely send your secret crush to Gaia Storage
-    userSession.putFile("crush.json", crush, { encrypt: true });
+    userSession
+      .putFile("user.json", JSON.stringify(user), options)
+      .then(data => {
+        this.setState({ gaiaUser: user });
+        console.log(data); // see that the data is encrypted
+      });
+
     // note that at this time, Blockstack only allows PUT but not PATCH
-    // you are essentially replacing all the previous content
+    // you are replacing the entire gaiaUser object
   };
 
   // I'M NEW, getFile is also a method provided by Blockstack library
-  getGaiaCrush = () => {
+  getGaiaUser = () => {
     const { userSession } = this.state;
+    let options = { decrypt: true };
 
-    userSession.getFile("crush.json", { decrypt: true }).then(data => {
+    userSession.getFile("user.json", options).then(data => {
       if (data) {
-        const crush = data;
-        this.setState({ gaiaCrush: crush });
+        const user = JSON.parse(data);
+        this.setState({ gaiaUser: user });
       } else {
-        const crush = "";
-        this.setState({ gaiaCrush: crush });
+        const user = {};
+        this.setState({ gaiaUser: user });
       }
     });
   };
 
   render() {
-    const {
-      userSession,
-      currentUser,
-      superhero,
-      crush,
-      gaiaCrush
-    } = this.state;
+    const { userSession, currentUser, superhero, crush, gaiaUser } = this.state;
     let hero = currentUser.superhero;
+    let gaiaCrush = gaiaUser.crush;
 
     return (
       <div className="App">
@@ -167,9 +171,8 @@ class App extends Component {
               <div className="superhero">
                 <form onSubmit={this.submitHandler}>
                   <label htmlFor="superhero">
-                    Who's your favorite superhero?
+                    <h3>Who's your favorite superhero?</h3>
                   </label>
-                  <br />
                   <input
                     id="superhero"
                     className="form-control"
@@ -185,19 +188,23 @@ class App extends Component {
                 </form>
 
                 {hero && hero.toLowerCase() === "ironman" ? (
-                  <p>Good choice, {hero} is the best!</p>
+                  <h4>Good choice, {hero} is the best!</h4>
                 ) : hero ? (
                   <p>{hero} is okay, but Ironman is the best!</p>
                 ) : null}
+
+                <p>
+                  This information is accessible to the public should you allow
+                  other apps to fetch from your API.
+                </p>
               </div>
 
               <div className="crush">
                 {/* sending this information to Gaia Storage */}
                 <form onSubmit={this.submitGaiaHandler}>
                   <label htmlFor="crush">
-                    Who's your current or childhood crush?
+                    <h3>Who's your current or childhood crush?</h3>
                   </label>
-                  <br />
                   <input
                     id="crush"
                     className="form-control"
@@ -212,7 +219,14 @@ class App extends Component {
                   </button>
                 </form>
 
-                {gaiaCrush ? <p>{gaiaCrush} probably liked you too.</p> : null}
+                {gaiaCrush ? (
+                  <h4>{gaiaCrush} probably likes you too.</h4>
+                ) : null}
+
+                <p>
+                  Your secret is safe, only you have access to this information
+                  and it is extremely difficult to hack.
+                </p>
               </div>
             </div>
           </div>
